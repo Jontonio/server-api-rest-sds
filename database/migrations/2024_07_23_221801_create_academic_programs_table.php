@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('academic_programs', function (Blueprint $table) {
             $table->increments('id_academic_program');
             $table->string('academic_program_bim',4);
-            $table->dateTime('academic_program_start');
-            $table->dateTime('academic_program_finish');
+            $table->date('academic_program_start');
+            $table->date('academic_program_finish');
             $table->string('status',1)->default(true);
             $table->string('modular_code',8);
             $table->foreign('modular_code')->references('modular_code')->on('institutions');

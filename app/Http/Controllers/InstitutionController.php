@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Institution\CreateInstitutionRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\Institution;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 
 class InstitutionController extends Controller
 {
@@ -12,15 +17,29 @@ class InstitutionController extends Controller
      */
     public function index()
     {
-        //
+        try{
+            $institutions = Institution::where('status','!=', 0)->paginate(10);
+            return ApiResponse::success('Lista de instituciones ', 200, $institutions);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(),500);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateInstitutionRequest $request)
     {
-        //
+        try{
+            $institution = Institution::create($request->all());
+            return ApiResponse::success('Nueva institución registrado correctamente', 201, $institution);
+        } catch(ValidationException $e){
+            return ApiResponse::error($e->getMessage(),422);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**

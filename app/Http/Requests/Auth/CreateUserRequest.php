@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -20,10 +20,9 @@ class CreateUserRequest extends FormRequest
         return [
             'id_card_user' => 'required|unique:users',
             'surname_user' => 'required',
-            'id_inia_station' => 'sometimes|numeric|exists:inia_stations,id_inia_station',
+            'cod_modular_ie' => 'sometimes|string|exists:institutions,modular_code',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
         ];
     }
 
@@ -42,7 +41,8 @@ class CreateUserRequest extends FormRequest
             'id_card_user.required' => 'El DNI del usuario es requerido',
             'id_card_user.unique' => 'El DNI del usuario debe ser único, registre otro DNI',
             'surname_user.required' => 'Los apellidos del usuario es requerido',
-            'id_inia_station.exists' => 'La estación que intenta asignar al usuario aún no se encuentra registrado'
+            'cod_modular_ie.exists' => 'El código modular de la institución a asignar al usuario aún no se encuentra registrado',
+            'cod_modular_ie.string' => 'El código modular de la institución debe ser string'
         ];
     }
 
@@ -52,7 +52,7 @@ class CreateUserRequest extends FormRequest
         $errors = $validator->errors()->toArray();
         $response = [
             'success' => false,
-            'message' => 'Validation errors',
+            'message' => 'Error en validación de datos',
             'errors' => $errors,
             'data' => null
         ];

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreateUserRequest;
-use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\Auth\CreateUserRequest;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Permission\AssignPermissionRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\User;
 use Dotenv\Exception\ValidationException;
+use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,19 +29,22 @@ class AuthController extends Controller
                 'surname_user' => $request->surname_user,
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'cod_modular_ie' => $request->cod_modular_ie,
+                'password' => Hash::make($request->id_card_user),
             ]);
 
             return ApiResponse::success('Usuario registrado correctamente', 200, $user);
 
         } catch (ValidationException $e){
-            return ApiResponse::error($e->getMessage(),500);
+            return ApiResponse::error($e->getMessage(), 500);
         } catch (InternalErrorException $e) {
-            return ApiResponse::error('Error: ' . $e->getMessage(), 500);
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
-    public function login(LoginUserRequest $request){
+    public function login(LoginRequest $request){
 
         try {
 
@@ -51,28 +56,29 @@ class AuthController extends Controller
 
             // verify if exists token
             if (!$token) {
-                return ApiResponse::success('Email y/o password invalido', 401, null);
+                return ApiResponse::success('Email y/o password inválido', 401, null);
             }
 
             $user = Auth::guard('api')->user();
 
             $authorization = [
                 'authorization' => [
-                    'token' => $token,
-                    'type' => 'bearer',
-                    ]
+                'token' => $token,
+                'type' => 'bearer',
+                ]
             ];
 
             return ApiResponse::success('Bienvenido al sistema ' . $user->name, 200, $authorization);
-
         } catch (ValidationException $e) {
             return ApiResponse::error($e->getMessage(), 500);
         } catch (InternalErrorException $e) {
-            return ApiResponse::error('Error: ' . $e->getMessage(), 500);
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
-    public function userAuthenticated(Request $request)
+    public function checkUser(Request $request)
     {
         try {
 
@@ -80,7 +86,7 @@ class AuthController extends Controller
 
             $userAuth['token'] = $request->token;
 
-            return ApiResponse::success('Usuario autentificado '.$userAuth->name, 200, $userAuth);
+            return ApiResponse::success('Usuario verificado '.$userAuth->name, 200, $userAuth);
 
         } catch (ValidationException $e){
             return ApiResponse::error($e->getMessage(),500);
@@ -98,7 +104,9 @@ class AuthController extends Controller
             return ApiResponse::success('Lista de usuarios del sistema', 200, $users);
 
         } catch (InternalErrorException $e) {
-            return ApiResponse::error('Error: ' . $e->getMessage(), 500);
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
@@ -112,6 +120,8 @@ class AuthController extends Controller
 
         } catch (InternalErrorException $e) {
             return ApiResponse::error('Error: ' . $e->getMessage(), 500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
@@ -125,6 +135,8 @@ class AuthController extends Controller
 
         } catch (InternalErrorException $e) {
             return ApiResponse::error('Error: ' . $e->getMessage(), 500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
@@ -137,6 +149,8 @@ class AuthController extends Controller
 
         } catch (InternalErrorException $e) {
             return ApiResponse::error('Error: ' . $e->getMessage(), 500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
@@ -148,46 +162,52 @@ class AuthController extends Controller
                 'status' => 'success',
                 'user' => Auth::guard('api')->user(),
                 'authorisation' => [
-                    'token' => Auth::guard('api')->refresh(),
+                    'token' => 'test',
+                    // 'token' => Auth::guard('api')->refresh(),
                     'type' => 'bearer',
                 ]
             ]);
         } catch (ValidationException $e){
             return ApiResponse::error($e->getMessage(),500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 
-    public function assignUserRole(Request $request, $id){
+    public function assignUserRole(AssignPermissionRequest $request, $id){
 
         try {
 
-            $get_role = $request->role;
-            $get_permissions = $request->permissions;
+            $get_roles = $request->input('role');
+
+            $get_permissions = array_map(function($permission) {
+                return $permission['name'];
+            }, $request->input('permission'));
 
             $user = User::findOrFail($id);
-            $role = Role::where('name','=',$get_role)->first();
 
-            if(!$role){
-                return ApiResponse::error('El rol '.$get_role.' no es un rol del sistema', 404);
-            }
-
+            // Eliminar todos los roles y permisos existentes del usuario
             $user->syncRoles([]);
             $user->syncPermissions([]);
 
-            $role->syncPermissions($get_permissions);
-            $user->assignRole([$role->id]);
+            foreach ($get_roles as $role_name) {
+                $role = Role::where('name', $role_name)->first();
+                $role->syncPermissions($get_permissions);
+                $user->assignRole($role->id);
+            }
 
-            $all_users_with_all_their_roles_and_permissions = User::where('id', '=', $id)->with('roles.permissions')->get();
+            $userWithRolesAndPermissions = User::where('id', $id)->with('roles.permissions')->get();
 
-
-            return ApiResponse::success('Se asignaron los roles y permisos correctamente al usuario', 200, $all_users_with_all_their_roles_and_permissions);
+            return ApiResponse::success('Se asignaron los roles y permisos correctamente al usuario', 200, $userWithRolesAndPermissions);
 
         } catch (ModelNotFoundException $e) {
             return ApiResponse::error('Usuario con ID '.$id.' no encontrado', 404, $e);
         } catch (ValidationException $e){
-            return ApiResponse::error($e->getMessage(),500);
+            return ApiResponse::error($e->getMessage(), 500);
         } catch (InternalErrorException $e) {
-            return ApiResponse::error('Error: ' . $e->getMessage(), 500);
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (Exception $e) {
+            return ApiResponse::error($e->getMessage(), 500);
         }
     }
 }

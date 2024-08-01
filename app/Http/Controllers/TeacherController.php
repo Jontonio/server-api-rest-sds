@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Teacher\CreateTeacherRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\Teacher;
+use Dotenv\Exception\ValidationException;
+use Exception;
 use Illuminate\Http\Request;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 
 class TeacherController extends Controller
 {
@@ -12,15 +17,33 @@ class TeacherController extends Controller
      */
     public function index()
     {
-        //
+        try{
+
+            $teachers = Teacher::where('status', 1)
+            ->paginate(15);
+            return ApiResponse::success('Lista docentes registrados', 200, $teachers);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateTeacherRequest $request)
     {
-        //
+        try{
+            $teacher = Teacher::create($request->all());
+            return ApiResponse::success('Docente registrado correctamente', 201, $teacher);
+        } catch(ValidationException $e){
+            return ApiResponse::error($e->getMessage(),422);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**

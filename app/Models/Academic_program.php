@@ -17,6 +17,12 @@ class Academic_program extends Model
         'modular_code',
         'id_academic_calendar',
     ];
+
+    protected $dates = [
+        'academic_program_start',
+        'academic_program_finish',
+    ];
+
     public function class_unit()
     {
         return $this->hasMany(Class_unit::class,'id_academic_program');

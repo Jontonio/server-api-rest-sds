@@ -21,8 +21,9 @@ class JwtMiddleware
             $token = JWTAuth::fromUser($user);
 
             $tokenWithData = JWTAuth::setToken($token)->getPayload()->toArray();
-            if ($user->id_inia_station) {
-                $tokenWithData['id_inia_station'] = $user->id_inia_station;
+
+            if ($user->cod_modular_ie) {
+                $tokenWithData['cod_modular_ie'] = $user->cod_modular_ie;
             }
             $token = JWTAuth::fromUser($user, $tokenWithData);
 
@@ -35,7 +36,7 @@ class JwtMiddleware
         } catch (JWTException $e) {
             return ApiResponse::error('Acceso no autorizado, inicie sesión para continuar.', 401);
         } catch (Exception $e) {
-            return ApiResponse::error('Acceso no autorizado.', 401);
+            return ApiResponse::error($e->getMessage(), 401);
         }
 
         return $next($request);

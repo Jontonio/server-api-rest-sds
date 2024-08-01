@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('id_card')->references('id_card')->on('teachers');
             $table->string('modular_code',8);
             $table->foreign('modular_code')->references('modular_code')->on('institutions');
-            $table->unsignedInteger('id_college');
+            $table->unsignedInteger('id_college')->nullable();
             $table->foreign('id_college')->references('id_college')->on('colleges');
             $table->timestamps();
         });

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Teacher extends Model
 {
     protected $primaryKey = 'id_card';
+    public $incrementing = false;
+
     use HasFactory;
     protected $fillable = [
         'id_card',

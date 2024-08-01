@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Institution extends Model
 {
     protected $primaryKey = 'modular_code';
+    public $incrementing = false;
+
     use HasFactory;
     protected $fillable = [
         'modular_code',

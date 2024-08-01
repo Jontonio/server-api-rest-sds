@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CreateAreaRequest extends FormRequest
 {
@@ -25,14 +27,15 @@ class CreateAreaRequest extends FormRequest
             'area_name ' => 'required|unique:charges|regex:/^[\pL\s]+$/u',
         ];
     }
+
     public function messages():array
     {
         return [
             'area_name.required' => 'El nombre del area es requerido',
             'area_name.unique' => 'El nombre del area debe ser único',
-
         ];
     }
+
     public function failedValidation(Validator $validator)
     {
 
@@ -45,6 +48,5 @@ class CreateAreaRequest extends FormRequest
         ];
 
         throw new HttpResponseException(response()->json($response, 422));
-
     }
 }

@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\College\CreateCollegeRequest;
+use App\Http\Responses\ApiResponse;
 use App\Models\College;
+use Dotenv\Exception\ValidationException;
+use Exception;
 use Illuminate\Http\Request;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 
 class CollegeController extends Controller
 {
@@ -12,15 +17,32 @@ class CollegeController extends Controller
      */
     public function index()
     {
-        //
+        try{
+            $colleges = College::where('status', 1)
+            ->paginate(10);
+            return ApiResponse::success('Lista colegiados registrados', 200, $colleges);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateCollegeRequest $request)
     {
-        //
+        try{
+            $college = College::create($request->all());
+            return ApiResponse::success('Nuevo colegiado registrado correctamente', 201, $college);
+        } catch(ValidationException $e){
+            return ApiResponse::error($e->getMessage(),422);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**
