@@ -24,7 +24,7 @@ class CreateAreaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'area_name' => 'required|string|max:200|unique:areas,area_name',
+            'area_name' => 'required|string|max:150|unique:areas,area_name',
         ];
     }
 
@@ -33,7 +33,7 @@ class CreateAreaRequest extends FormRequest
         return [
             'area_name.required' => 'El campo del nombre de area es requerido.',
             'area_name.string' => 'El campo del nombre de area debe ser string.',
-            'area_name.max' => 'El campo del nombre de area debe ser como máximo de 20 caracteres.',
+            'area_name.max' => 'El campo del nombre de area debe ser como máximo de 150 caracteres.',
             'area_name.unique' => 'El área ya se encuentra registrada, intente con uno nuevo.',
         ];
     }

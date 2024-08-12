@@ -13,6 +13,7 @@ class Grade extends Model
         'id_grade',
         'grade_name',
     ];
+
     public function teacher_area()
     {
         return $this->hasMany(Teacher_area::class,'id_grade');

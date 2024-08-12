@@ -30,6 +30,7 @@ class AuthController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'cod_modular_ie' => $request->cod_modular_ie,
+                'id_ie_teacher' => $request->id_ie_teacher,
                 'password' => Hash::make($request->id_card_user),
             ]);
 
@@ -113,11 +114,8 @@ class AuthController extends Controller
     public function getRoles()
     {
         try {
-
             $roles = Role::get();
-
             return ApiResponse::success('Lista de roles del sistema', 200, $roles);
-
         } catch (InternalErrorException $e) {
             return ApiResponse::error('Error: ' . $e->getMessage(), 500);
         } catch (Exception $e) {

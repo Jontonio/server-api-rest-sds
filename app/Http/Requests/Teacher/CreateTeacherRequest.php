@@ -24,12 +24,12 @@ class CreateTeacherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id_card' => 'required|max:15|unique:teachers,id_card',
+            'id_card' => 'required|max:15',
             'type_id_card' => 'required|max:20',
             'names' => 'required|max:50',
             'first_name' => 'required|max:50',
             'last_name' => 'required|max:50',
-            'email' => 'required|email|max:100|unique:teachers,email',
+            'email' => 'required|email|max:100',
             'phone_number' => 'required|max:10',
         ];
     }
@@ -39,7 +39,6 @@ class CreateTeacherRequest extends FormRequest
         return [
             'id_card.required' => 'El documento del docente es requerido',
             'id_card.max' => 'El documento del docente debe ser como máximo de 15 caracteres',
-            'id_card.unique' => 'El documento del docente debe ser único, registre uno nuevo.',
             'type_id_card.required' => 'El tipo de documento del docente es requerido',
             'type_id_card.max' => 'El tipo de documento del docente debe ser como máximo de 20 caracteres',
             'names.required' => 'El nombre del docente es requerido',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Institution\CreateInstitutionRequest;
+use App\Http\Requests\Institution\ParamModularCodeRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\Institution;
 use Exception;
@@ -45,9 +46,16 @@ class InstitutionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Institution $institution)
+    public function show(ParamModularCodeRequest $request, $modular_code)
     {
-        //
+        try{
+            $institution = Institution::where('status','!=', 0)->where('modular_code', $modular_code)->first();
+            return ApiResponse::success('Institución', 200, $institution);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(),500);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**

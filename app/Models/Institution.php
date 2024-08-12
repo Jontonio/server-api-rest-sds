@@ -18,6 +18,7 @@ class Institution extends Model
         'management_dependency',
         'address_ie',
     ];
+
     public function institution_teacher()
     {
         return $this->hasMany(Institution_teacher::class,'modular_code');
@@ -25,5 +26,9 @@ class Institution extends Model
     public function academic_program()
     {
         return $this->hasMany(Academic_program::class,'modular_code');
+    }
+    public function notice()
+    {
+        return $this->hasMany(Notice::class,'modular_code');
     }
 }

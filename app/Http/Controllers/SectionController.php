@@ -8,7 +8,6 @@ use App\Http\Responses\ApiResponse;
 use App\Models\Section;
 use Dotenv\Exception\ValidationException;
 use Exception;
-use Illuminate\Http\Request;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
 
 class SectionController extends Controller

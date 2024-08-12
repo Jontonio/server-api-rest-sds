@@ -21,6 +21,7 @@ class CreateUserRequest extends FormRequest
             'id_card_user' => 'required|unique:users',
             'surname_user' => 'required',
             'cod_modular_ie' => 'sometimes|string|exists:institutions,modular_code',
+            'id_ie_teacher' => 'sometimes|nullable|numeric|exists:institution_teachers,id_ie_teacher',
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
         ];
@@ -42,7 +43,8 @@ class CreateUserRequest extends FormRequest
             'id_card_user.unique' => 'El DNI del usuario debe ser único, registre otro DNI',
             'surname_user.required' => 'Los apellidos del usuario es requerido',
             'cod_modular_ie.exists' => 'El código modular de la institución a asignar al usuario aún no se encuentra registrado',
-            'cod_modular_ie.string' => 'El código modular de la institución debe ser string'
+            'cod_modular_ie.string' => 'El código modular de la institución debe ser string',
+            'id_ie_teacher.numeric' => 'El id de institución educativa docente debe ser entero'
         ];
     }
 

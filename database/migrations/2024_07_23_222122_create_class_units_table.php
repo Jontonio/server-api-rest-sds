@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('status',1)->default(true);
             $table->unsignedInteger('id_teacher_area');
             $table->foreign('id_teacher_area')->references('id_teacher_area')->on('teacher_areas');
-            $table->unsignedInteger('id_academic_program');
-            $table->foreign('id_academic_program')->references('id_academic_program')->on('academic_programs');
+            $table->unsignedInteger('id_unit');
+            $table->foreign('id_unit')->references('id_unit')->on('units');
             $table->timestamps();
         });
     }

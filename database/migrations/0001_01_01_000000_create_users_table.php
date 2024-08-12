@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('cod_modular_ie')->nullable();
+            $table->integer('id_ie_teacher')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

@@ -25,7 +25,7 @@ class EditInstitutionTeacherRequest extends FormRequest
     {
         return [
             'id_card' => 'required|max:15|exists:teachers,id_card',
-            "modular_code" => "required|string|min:7|max:7|exists:institutions",
+            "modular_code" => "required|string|min:7|max:8|exists:institutions",
             "id_college" => "sometimes|numeric|exists:colleges,id_college",
         ];
     }
@@ -39,7 +39,7 @@ class EditInstitutionTeacherRequest extends FormRequest
             "modular_code.required" => "El codigo modular de la institución es requerido",
             "modular_code.string" => "El codigo modular de la institución debe ser string",
             "modular_code.min" => "El codigo modular de la institución debe ser de 7 dígitos",
-            "modular_code.max" => "El codigo modular de la institución debe ser de 7 dígitos",
+            "modular_code.max" => "El codigo modular de la institución debe ser de 8 dígitos",
             "modular_code.exists" => "El codigo modular de la institución no se encuentra registrado, registre uno antes de continuar",
             "id_college.numeric" => "El id del colegiado debe ser númerico",
             "id_college.exists" => "El id del colegiado no se encuentra registrado, registre uno antes de continuar",

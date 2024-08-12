@@ -18,7 +18,7 @@ class ExistUser
         $existingParticipant = User::where('id', $id)->first();
 
         if (!$existingParticipant) {
-            return ApiResponse::error('El usuario con ID '.$id.' no se encuntra aun registrado', 404);
+            return ApiResponse::error('El usuario con ID '.$id.' no se encuentra aun registrado', 404);
         }
         return $next($request);
     }

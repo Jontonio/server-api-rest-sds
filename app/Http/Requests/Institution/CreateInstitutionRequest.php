@@ -17,7 +17,7 @@ class CreateInstitutionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "modular_code" => "required|string|min:7|max:7|unique:institutions",
+            "modular_code" => "required|string|min:7|max:8|unique:institutions",
             "name_ie" => "required|string|max:100",
             "level_modality" => "required|string|max:50",
             "management_dependency" => "required|string|max:45",

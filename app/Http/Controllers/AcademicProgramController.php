@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AcademicProgram\CreateAcademicProgramRequest;
+use App\Http\Requests\AcademicProgram\EditAcademicProgramRequest;
 use App\Http\Requests\AcademicProgram\ParamAcademicProgramRequest;
+use App\Http\Requests\Institution\ParamModularCodeRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\Academic_program;
 use Dotenv\Exception\ValidationException;
@@ -16,16 +18,23 @@ class AcademicProgramController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function get_academic_program_from_ie(ParamAcademicProgramRequest $request)
+    public function get_academic_program_from_ie(ParamModularCodeRequest $request)
     {
         try{
+            $year = date('Y');
             $modular_code = $request->query('modular_code');
-            $id_academic_calendar = $request->query('id_academic_calendar');
 
             $cademic_program = Academic_program::where('status', 1)
             ->where('modular_code', $modular_code)
-            ->where('id_academic_calendar', $id_academic_calendar)
-            ->paginate(15);
+            ->with([
+                'academic_calendar',
+                'unit' => function($query) {
+                    $query->where('status', 1)
+                    ->orderBy('unit_name', 'asc');
+                }
+            ])
+            ->whereYear('created_at', $year)
+            ->paginate(10);
 
             return ApiResponse::success('Lista de programación acádemico', 200, $cademic_program);
         } catch (Exception $e){
@@ -66,6 +75,23 @@ class AcademicProgramController extends Controller
         }
     }
 
+    public function get_units_from_program_academic(Request $request)
+    {
+        try{
+            $year = Date('Y');
+            $id_academic_program = $request->id_academic_program;
+
+            $academic_programs = Academic_program::where('status', 1)
+            ->with(['unit'])
+            ->paginate(10);
+            return ApiResponse::success('Lista de unidades registradas', 200, $academic_programs);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
@@ -77,9 +103,19 @@ class AcademicProgramController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Academic_program $academic_program)
+    public function update(EditAcademicProgramRequest $request, $id_academic_program)
     {
-        //
+        try{
+            $academic_program = Academic_program::find($id_academic_program);
+            $res_update = $academic_program->update($request->all());
+            return ApiResponse::success('Actualización de datos del bimestre', 201, $res_update);
+        } catch(ValidationException $e){
+            return ApiResponse::error($e->getMessage(), 422);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(), 500);
+        }
     }
 
     /**

@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AcademicProgram\ParamAcademicProgramRequest;
 use App\Http\Requests\Institution\ParamModularCodeRequest;
 use App\Http\Requests\InstitutionTeacher\EditInstitutionTeacherRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\Institution_teacher;
-use App\Models\Institution_teachers;
-use App\Models\Teacher;
 use Dotenv\Exception\ValidationException;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
 
 class InstitutionTeacherController extends Controller
@@ -39,7 +37,6 @@ class InstitutionTeacherController extends Controller
         } catch (InternalErrorException $e) {
             return ApiResponse::error($e->getMessage(), 500);
         }
-
     }
     public function get_teachers_from_ie_assign(ParamModularCodeRequest $request)
     {
@@ -73,6 +70,20 @@ class InstitutionTeacherController extends Controller
     public function store(EditInstitutionTeacherRequest $request)
     {
         try{
+            $year = Date("Y");
+            $id_card = $request->id_card;
+            $modular_code = $request->modular_code;
+
+            $exist_ie_teacher = Institution_teacher::where('status', 1)
+                            ->where('modular_code', $modular_code)
+                            ->where('id_card', $id_card)
+                            ->whereYear('created_at', $year)
+                            ->first();
+
+            if($exist_ie_teacher){
+                return ApiResponse::error('El docente ya se encuentra registrado en la institución ', 422, null);
+            }
+
             $ie_teacher = Institution_teacher::create($request->all());
             return ApiResponse::success('Docente registrado correctamente a la institución', 201, $ie_teacher);
         } catch(ValidationException $e){

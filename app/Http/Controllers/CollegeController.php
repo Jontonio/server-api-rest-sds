@@ -19,7 +19,7 @@ class CollegeController extends Controller
     {
         try{
             $colleges = College::where('status', 1)
-            ->paginate(10);
+            ->paginate(15);
             return ApiResponse::success('Lista colegiados registrados', 200, $colleges);
         } catch (Exception $e){
             return ApiResponse::error($e->getMessage(), 500);

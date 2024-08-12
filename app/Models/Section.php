@@ -9,6 +9,7 @@ class Section extends Model
 {
     protected $primaryKey = 'id_section';
     use HasFactory;
+
     protected $fillable = [
         'id_section',
         'section_name',

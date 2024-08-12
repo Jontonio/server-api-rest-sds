@@ -34,6 +34,6 @@ class Teacher_area extends Model
     }
     public function section()
     {
-        return $this->belongsTo(section::class,'id_section');
+        return $this->belongsTo(Section::class,'id_section');
     }
 }

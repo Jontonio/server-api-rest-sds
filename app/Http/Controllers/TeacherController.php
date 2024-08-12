@@ -20,8 +20,20 @@ class TeacherController extends Controller
         try{
 
             $teachers = Teacher::where('status', 1)
-            ->paginate(15);
+            ->paginate(10);
             return ApiResponse::success('Lista docentes registrados', 200, $teachers);
+        } catch (Exception $e){
+            return ApiResponse::error($e->getMessage(), 500);
+        } catch (InternalErrorException $e) {
+            return ApiResponse::error($e->getMessage(), 500);
+        }
+    }
+
+    public function get_teacher_by_document($id_card)
+    {
+        try{
+            $teacher = Teacher::where('id_card', $id_card)->first();
+            return ApiResponse::success('Docente registrado', 200, $teacher);
         } catch (Exception $e){
             return ApiResponse::error($e->getMessage(), 500);
         } catch (InternalErrorException $e) {
@@ -35,8 +47,15 @@ class TeacherController extends Controller
     public function store(CreateTeacherRequest $request)
     {
         try{
-            $teacher = Teacher::create($request->all());
-            return ApiResponse::success('Docente registrado correctamente', 201, $teacher);
+            $validatedData = $request->validated();
+            $exist_teacher = Teacher::where('id_card', $validatedData['id_card'])->first();
+            if ($exist_teacher) {
+                $exist_teacher->update($validatedData);
+                return ApiResponse::success('Docente actualizado correctamente', 200, $exist_teacher);
+            } else {
+                $teacher = Teacher::create($validatedData);
+                return ApiResponse::success('Docente registrado correctamente', 201, $teacher);
+            }
         } catch(ValidationException $e){
             return ApiResponse::error($e->getMessage(),422);
         } catch (InternalErrorException $e) {

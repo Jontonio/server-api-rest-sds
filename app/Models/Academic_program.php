@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Academic_program extends Model
 {
     protected $primaryKey = 'id_academic_program';
+
     use HasFactory;
     protected $fillable = [
         'id_academic_program',
@@ -23,9 +24,9 @@ class Academic_program extends Model
         'academic_program_finish',
     ];
 
-    public function class_unit()
+    public function unit()
     {
-        return $this->hasMany(Class_unit::class,'id_academic_program');
+        return $this->hasMany(Unit::class,'id_academic_program');
     }
     public function institution()
     {
